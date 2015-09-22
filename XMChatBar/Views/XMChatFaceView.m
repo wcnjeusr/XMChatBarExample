@@ -138,6 +138,7 @@
 
     
     NSMutableArray *recentFaces = [NSMutableArray arrayWithArray:[XMFaceManager recentFaces]];
+    [recentFaces addObject:@{@"face_id":@"999",@"face_name":@"删除"}];
     NSUInteger line = 0;
     NSUInteger column = 0;
     CGFloat itemWidth = (self.frame.size.width - 20) / 4;
@@ -258,11 +259,12 @@
 - (void)handleTap:(UITapGestureRecognizer *)tap{
     NSString *faceName = [XMFaceManager faceImageNameWithFaceID:tap.view.tag];
 //    NSString *faceName = [XMFaceManager faceNameWithFaceImageName:[NSString stringWithFormat:@"%ld",tap.view.tag]];
-    if (tap.view.tag != 999) {
-        [XMFaceManager saveRecentFace:@{@"face_id":[NSString stringWithFormat:@"%ld",tap.view.tag],@"face_name":faceName}];
+    if (tap.view.tag == 999) {
+        faceName = @"[删除]";
     }
     if (self.delegate && [self.delegate respondsToSelector:@selector(faceViewSendFace:)]) {
         [self.delegate faceViewSendFace:faceName];
+        [XMFaceManager saveRecentFace:@{@"face_id":[NSString stringWithFormat:@"%ld",tap.view.tag],@"face_name":faceName}];
     }
 }
 

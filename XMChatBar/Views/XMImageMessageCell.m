@@ -26,6 +26,7 @@
     if (CGRectContainsPoint(self.messageMaskImageView.frame, touchPoint)) {
         if (self.messageDelegate && [self.messageDelegate respondsToSelector:@selector(XMImageMessageTapped:)]) {
             [self.messageDelegate XMImageMessageTapped:(XMImageMessage *)self.message];
+            [self.messageDelegate XMImageViewTapped:(UIImageView *)self.messageImageView];
         }
     }
 }

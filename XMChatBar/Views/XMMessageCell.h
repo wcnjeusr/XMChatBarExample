@@ -37,6 +37,9 @@
 
 @property (strong, nonatomic) UIImageView *messageSendStateImageView /**< 显示发送状态消息状态 */;
 @property (strong, nonatomic) UILabel *messageNickNameLabel /**< 显示发送者昵称 */;
+@property (strong, nonatomic) UIActivityIndicatorView *sendActivityView;/**<加载框*/
+
+
 
 @property (weak, nonatomic) id<XMMessageDelegate> messageDelegate /**< 消息代理事件 */;
 

@@ -12,10 +12,7 @@
 #import "XMImageMessage.h"
 #import "XMLocationMessage.h"
 #import "XMVoiceMessage.h"
-
-
-//!!! test
-#import "UIImageView+XMWebImage.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface XMMessageCell    ()
 
@@ -52,7 +49,8 @@
     [self.contentView addSubview:self.avatarImageView];
     [self.contentView addSubview:self.messageNickNameLabel];
     [self.contentView addSubview:self.messageContentView];
-    
+    [self.contentView addSubview:self.sendActivityView];
+
     UILongPressGestureRecognizer *longPressGes = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     longPressGes.numberOfTouchesRequired = 1;
     longPressGes.minimumPressDuration = 1.0f;
@@ -120,8 +118,15 @@
             make.width.equalTo(@kAvatarSize);
             make.height.equalTo(@kAvatarSize);
         }];
+        [self.sendActivityView mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.right.equalTo(self.messageContentView.mas_left).with.offset(-5);
+            make.centerY.equalTo(self.contentView.mas_centerY);
+            make.width.equalTo(@kAvatarSize);
+            make.height.equalTo(@kAvatarSize);
+        }];
     }else{
         self.avatarImageView.hidden = YES;
+        self.sendActivityView.hidden = YES;
     }
     
 }
@@ -213,8 +218,20 @@
         self.messageBackgroundImageView.highlightedImage = [[UIImage imageNamed:@"message_receiver_background_highlight"] resizableImageWithCapInsets:UIEdgeInsetsMake(28, 20, 15, 20) resizingMode:UIImageResizingModeStretch];
     }
     self.messageNickNameLabel.text = message.senderNickName;
-    [self.avatarImageView setImageWithUrlString:message
-         .senderAvatarThumb];
+    if([_message.senderAvatarThumb hasPrefix:@"http://"]||[_message.senderAvatarThumb hasPrefix:@"https://"]){
+        [self.avatarImageView setImageWithURL:[[NSURL alloc] initWithString:_message.senderAvatarThumb] placeholderImage:nil];
+    }
+    if(_message.messageOwner == XMMessageOwnerTypeSelf){
+        [_sendActivityView startAnimating];
+        self.messageBackgroundImageView.layer.borderWidth = 0;
+        if(_message.messageSendState==XMMessageSendFail){
+            [_sendActivityView stopAnimating];
+            self.messageBackgroundImageView.layer.borderWidth = 1;
+            self.messageBackgroundImageView.layer.borderColor = [[UIColor redColor] CGColor];
+        }else if(_message.messageSendState==XMMessageSendSuccess){
+            [_sendActivityView stopAnimating];
+        }
+    }
     [self updateConstraints];
 }
 
@@ -243,7 +260,7 @@
         _messageNickNameLabel = [[UILabel alloc] init];
         _messageNickNameLabel.font = [UIFont systemFontOfSize:10.0f];
         _messageNickNameLabel.textColor = [UIColor darkGrayColor];
-        _messageNickNameLabel.text = @"测试昵称";
+        _messageNickNameLabel.text = _message.senderNickName;
     }
     return _messageNickNameLabel;
 }
@@ -270,4 +287,19 @@
     return _menuController;
 }
 
+-(UIActivityIndicatorView*)sendActivityView{
+    if(!_sendActivityView){
+        _sendActivityView = [[UIActivityIndicatorView alloc] init];
+        //设置显示样式,见UIActivityIndicatorViewStyle的定义
+        _sendActivityView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+        //设置背景色
+        _sendActivityView.backgroundColor = [UIColor lightGrayColor];
+        //设置背景透明
+        _sendActivityView.alpha = 0.5;
+        //设置背景为圆角矩形
+        _sendActivityView.layer.cornerRadius = 6;
+        _sendActivityView.layer.masksToBounds = YES;
+    }
+    return _sendActivityView;
+}
 @end

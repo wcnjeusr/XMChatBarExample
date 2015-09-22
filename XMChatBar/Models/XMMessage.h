@@ -178,6 +178,7 @@ typedef NS_ENUM(NSUInteger, XMMessageReadState) {
  *  @param imageMessage 被点击的图片消息
  */
 - (void)XMImageMessageTapped:(XMImageMessage *)imageMessage;
+- (void)XMImageViewTapped:(UIImageView *)imageView;
 
 /**
  *  语音消息呗点击
